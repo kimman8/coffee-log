@@ -1,0 +1,689 @@
+/* Espresso Log: a barista's recipe card.
+   Porcelain ground, espresso ink, crema accent. One family (Archivo) at two widths:
+   condensed for the recipe figures, normal for everything else. */
+
+/* ---------- Tokens ---------- */
+:root {
+  --porcelain: #f3f4f2; /* ground: a white cup, not paper */
+  --surface: #ffffff; /* menus, the new-bag sheet */
+  --espresso: #24170f; /* text */
+  --crema: #b9782f; /* accent: figures, selected bean, main button. Large sizes only */
+  --on-crema: #24170f;
+  --steel: #5e6461; /* secondary text */
+  --rule: #dcdfdb;
+  --wash: #e8eae6; /* pressed / hover ground */
+  --red: #a3321f;
+
+  --radius: 12px;
+  --narrow: 75%; /* font-stretch for figures */
+
+  color-scheme: light dark;
+  font-family: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--espresso);
+  background: var(--porcelain);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --porcelain: #17110d; /* roasted bean */
+    --surface: #221a15;
+    --espresso: #edebe7;
+    --crema: #d9a05b;
+    --on-crema: #17110d;
+    --steel: #9ea39f;
+    --rule: #2c231d;
+    --wash: #2a211b;
+    --red: #e8735f;
+  }
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--porcelain);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--crema);
+  outline-offset: 2px;
+}
+
+.app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 8px 20px 120px; /* bottom room for the fixed action bar */
+}
+
+.muted {
+  color: var(--steel);
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+.error {
+  color: var(--red);
+  font-size: 0.925rem;
+}
+
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.link {
+  padding: 6px 0;
+  border: none;
+  background: none;
+  color: var(--steel);
+  font-size: 0.925rem;
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 4px;
+}
+
+.link:hover {
+  color: var(--espresso);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: transparent;
+  font-weight: 600;
+}
+
+.btn:active {
+  background: var(--wash);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn-primary {
+  width: 100%;
+  min-height: 56px;
+  border: none;
+  background: var(--crema);
+  color: var(--on-crema);
+  font-size: 1.1rem;
+  font-weight: 650;
+}
+
+.btn-primary:active {
+  background: var(--crema);
+  filter: brightness(0.94);
+}
+
+.btn-danger {
+  border-color: transparent;
+  color: var(--red);
+}
+
+/* ---------- Header ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+}
+
+.wordmark {
+  font-weight: 700;
+  font-stretch: var(--narrow);
+  font-size: 1.2rem;
+  letter-spacing: 0.01em;
+}
+
+.menu {
+  position: relative;
+}
+
+.menu > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 4px 0 12px;
+  border-radius: var(--radius);
+  color: var(--steel);
+  list-style: none;
+  cursor: pointer;
+}
+
+.menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.menu[open] > summary,
+.menu > summary:hover {
+  color: var(--espresso);
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  display: grid;
+  gap: 16px;
+  width: min(300px, calc(100vw - 40px));
+  padding: 18px;
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 16px 40px rgb(36 23 15 / 0.14);
+}
+
+.invite {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.invite-code {
+  font-size: 1.35rem;
+  font-weight: 600;
+  font-stretch: var(--narrow);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Bean row ---------- */
+.beans {
+  display: flex;
+  gap: 4px;
+  margin: 8px -20px 0;
+  padding: 0 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-padding: 0 20px;
+}
+
+.beans::-webkit-scrollbar {
+  display: none;
+}
+
+.bean {
+  position: relative;
+  flex: none;
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  min-height: 48px;
+  padding: 8px 12px 12px 0;
+  margin-right: 12px;
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+.bean-name {
+  font-weight: 600;
+  color: var(--steel);
+}
+
+.bean-age {
+  color: var(--steel);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.bean[aria-pressed='true'] .bean-name {
+  color: var(--espresso);
+}
+
+/* the selected bean gets a crema bar, like a tab */
+.bean[aria-pressed='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 12px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--crema);
+}
+
+.bean-add {
+  color: var(--steel);
+  font-weight: 500;
+  align-content: center;
+}
+
+.bean-detail {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  color: var(--steel);
+  font-size: 0.925rem;
+}
+
+.sheet {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ---------- Text inputs (sheet, login, setup) ---------- */
+.label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--steel);
+  font-size: 0.925rem;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--porcelain);
+  font-size: 1rem; /* 16px+ prevents iOS zoom on focus */
+}
+
+.textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--crema);
+  outline: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.row > .grow {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- The recipe: the one bold element ---------- */
+.editing-note {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 20px;
+  color: var(--steel);
+}
+
+.recipe {
+  display: grid;
+  gap: 2px;
+  margin-top: 28px;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  cursor: text;
+}
+
+.figure {
+  min-width: 1.4ch;
+  padding: 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--crema);
+  font-size: 4rem;
+  font-weight: 620;
+  font-stretch: var(--narrow);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.figure::placeholder {
+  color: color-mix(in srgb, var(--steel) 45%, transparent);
+  opacity: 1;
+}
+
+.figure:focus {
+  border-bottom-color: var(--crema);
+  outline: none;
+}
+
+.word {
+  color: var(--steel);
+  font-size: 1.1rem;
+}
+
+.ratio {
+  color: var(--espresso);
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-stretch: var(--narrow);
+  font-variant-numeric: tabular-nums;
+}
+
+.last {
+  margin-top: 10px;
+  color: var(--steel);
+  font-size: 0.925rem;
+}
+
+/* grind + rating */
+.settings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.grind {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  cursor: text;
+}
+
+.grind input {
+  width: 4.5ch;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  border-bottom: 2px solid var(--rule);
+  background: none;
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-stretch: var(--narrow);
+  font-variant-numeric: tabular-nums;
+}
+
+.grind input:focus {
+  border-bottom-color: var(--crema);
+  outline: none;
+}
+
+.grind input::placeholder {
+  color: var(--rule);
+  opacity: 1;
+}
+
+.rating {
+  display: flex;
+}
+
+.rating button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--rule);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.rating button.on {
+  color: var(--crema);
+}
+
+.rating button:active {
+  background: var(--wash);
+}
+
+.notes {
+  margin-top: 12px;
+}
+
+/* ---------- Fixed action bar (thumb reach) ---------- */
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--rule);
+  background: var(--porcelain);
+}
+
+.bar-inner {
+  display: flex;
+  gap: 8px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.bar-inner .btn-primary {
+  flex: 1;
+}
+
+.bar .error {
+  max-width: 480px;
+  margin: 0 auto 8px;
+}
+
+/* ---------- History: a dial-in notebook ---------- */
+.history {
+  margin-top: 40px;
+}
+
+.day {
+  padding: 20px 0 6px;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows > li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: 3.4rem 1fr auto;
+  gap: 2px 8px;
+  width: 100%;
+  padding: 12px 8px;
+  margin: 0 -8px;
+  width: calc(100% + 16px);
+  border: none;
+  border-radius: var(--radius);
+  background: none;
+  text-align: left;
+}
+
+button.entry:active,
+button.entry:hover {
+  background: var(--wash);
+}
+
+.entry.editing {
+  background: var(--wash);
+  box-shadow: inset 3px 0 0 var(--crema);
+}
+
+.entry-time {
+  color: var(--steel);
+  font-variant-numeric: tabular-nums;
+}
+
+.entry-bean {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry-recipe {
+  font-weight: 600;
+  font-stretch: var(--narrow);
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.entry-meta {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  color: var(--steel);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.entry-who {
+  grid-column: 3;
+  color: var(--steel);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.entry-notes {
+  grid-column: 2 / 4;
+  margin-top: 4px;
+  font-size: 0.925rem;
+}
+
+.stars {
+  color: var(--crema);
+  letter-spacing: 1px;
+}
+
+.empty {
+  padding: 32px 0;
+  color: var(--steel);
+}
+
+/* ---------- Login and setup ---------- */
+.center {
+  display: grid;
+  min-height: 80vh;
+  align-content: center;
+}
+
+.hero {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 28px;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  font-weight: 650;
+  font-stretch: var(--narrow);
+  line-height: 1.05;
+}
+
+.card {
+  padding: 20px;
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  border-radius: var(--radius);
+  background: var(--wash);
+}
+
+.segmented button {
+  min-height: 40px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--steel);
+  font-weight: 600;
+}
+
+.segmented button[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--espresso);
+}
+
+/* ---------- Motion: only in answer to an action ---------- */
+@keyframes arrive {
+  from {
+    background: color-mix(in srgb, var(--crema) 22%, transparent);
+  }
+}
+
+.rows > li.new .entry {
+  animation: arrive 1.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
