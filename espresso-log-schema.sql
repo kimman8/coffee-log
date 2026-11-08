@@ -154,6 +154,11 @@ create policy "update own member row" on public.household_members
   using (user_id = auth.uid())
   with check (user_id = auth.uid());
 
+-- The policy above picks WHICH row you may update; these grants limit WHICH COLUMNS.
+-- Without them you could change your own row's household_id and move into another household.
+revoke update on public.household_members from authenticated;
+grant update (display_name) on public.household_members to authenticated;
+
 -- beans: shared by the household.
 create policy "members read beans" on public.beans
   for select to authenticated

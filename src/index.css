@@ -687,3 +687,12 @@ button.entry:hover {
     transition: none !important;
   }
 }
+
+/* sign-in code: large, spaced digits */
+.code-input {
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-stretch: var(--narrow);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.3em;
+}

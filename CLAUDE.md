@@ -22,6 +22,8 @@ A shared espresso shot log for two people in one "household". Vite + React 19 + 
 - `households` (with `invite_code`), `household_members` (`display_name`), `beans`, `shots`.
 - Households are created and joined only through the `create_household` and `join_household` RPCs. Never insert into `households` or `household_members` directly.
 - RLS: members read everything in their household; beans are editable by any member; shots are editable and deletable only by the person who pulled them.
+- Policies choose rows, not columns. `household_members` updates are limited to `display_name` with a column grant; when adding an update policy, check whether it needs the same.
+- Sign-ups are meant to be turned off in Supabase once both people have accounts.
 - `shots → household_members` is a composite FK `(household_id, user_id)`, which is what lets `select('..., household_members(display_name))` embed who pulled a shot.
 - Finishing a bag sets `beans.archived = true`. Beans are never deleted from the UI, so old shots keep their bean name.
 
@@ -31,7 +33,8 @@ A shared espresso shot log for two people in one "household". Vite + React 19 + 
 - `src/types.ts`: hand-written row types (only the columns the app uses). Keep them in sync with the schema.
 - `src/format.ts`: number parsing (`num` accepts a comma decimal), ratio, days off roast, day and time labels.
 - `src/App.tsx`: session → membership → screen switch, plus the header account menu (invite code, sign out).
-- `src/Login.tsx`, `src/HouseholdSetup.tsx`: pre-household screens.
+- `src/Login.tsx`: email sign-in. The email carries a link and a code; the code (`verifyOtp`, type `email`) is what works in the iPhone home-screen app, which doesn't share Safari's session. Needs `{{ .Token }}` in the Supabase email templates.
+- `src/HouseholdSetup.tsx`: create or join a household.
 - `src/ShotLog.tsx`: data loading, the shot form (new and edit), the fixed action bar.
 - `src/BeanPicker.tsx`: bean tabs, new bag, "Mark finished".
 - `src/ShotList.tsx`: recent shots grouped by day.
