@@ -696,3 +696,23 @@ button.entry:hover {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.3em;
 }
+
+/* Continue with Google: neutral surface button, per Google's branding (no crema fill) */
+.btn-google {
+  width: 100%;
+  min-height: 52px;
+  gap: 10px;
+  background: var(--surface);
+}
+
+/* "or sign in with an email code" between the two sign-in methods */
+.or {
+  color: var(--steel);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.link:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
